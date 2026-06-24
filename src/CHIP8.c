@@ -36,8 +36,89 @@ bool loadROM(chip8* chip, const char* filepath){
 	return true;
 }
 
-void cycle(chip8* chip){
-	//TODO	
+//reads from memory and
+//returns instructions from memory
+uint16_t fetch(chip8* chip){
+	//could be written in one line 
+	//added first 8 byte instruction from memory
+	uint16_t instruction = chip->memory[chip->PC];
+	// shifted to left 
+	instruction = instruction<<8;
+	// add last 8 bytes from next adress
+	instruction = instruction | chip->memory[chip->PC+1];
+	//moved pc to next address
+	chip->PC += 2;
+	
+	return instruction;
 }
+void excecute(chip8* chip){
+	uint16_t instruction = fetch(chip);
+	/*
+	//First Nibble. Tells what kind of instruction it is
+	uint8_t opcode = instruction & 0xF000;
+	//Second Nibble. Looks for one of registers
+	uint8_t X = instruction & 0x0F00;
+	//Third Nibble also looks for one of registers
+	uint8_t Y = instruction & 0x00F0;
+	//Fourth Nibble. 4 Bit number
+	uint8_t N = instruc16tion & 0x000F;
+	//Second Byte, 8 bit immediate memory address
+	uint8_t NN = instruction & 0x00FF;
+	//Second, third and fourth Nubbles for 12 bit memory adress
+	uint16_t = NNN = instruction & 0x0FFF;
+*/
+	switch(instruction & 0xF000){
+		case 0x0000:
+			if(instruction == 0x00E0){
+				//clear screen
+			}
+			else if (instruction == 0x00EE){
+				chip->stackPointer--;
+				chip->PC = chip->stack[chip->stackPointer];
+			}
+			break;
+		//Jump instruction, jumps to NN
+		case 0x1000:
+			chip->PC = INS_NNN(instruction);
+			break;
+		case 0x2000:
+			chip->stack[chip->stackPointer] = chip->PC;
+			chip->stackPointer++;
+			break;
+		case 0x3000:
+			if(chip->V[INS_X(instruction) == INS_NN(instruction)]) chip->PC+=2;
+			break;
+		case 0x4000:
+			if(chip->V[INS_X(instruction) != INS_NN(instruction)]) chip->PC+=2;
+			break;
+		case 0x5000:
+			if(chip->V[INS_X(instruction)] == chip->V[INS_Y(instruction)]) chip->PC+=2;
+			break;
+		case 0x9000:
+			if(chip->V[INS_X(instruction)] != chip->V[INS_Y(instruction)]) chip->PC+=2;
+			break;
+		case 0x6000:
+			chip->V[INS_X(instruction)] = INS_NN(instruction);
+			break;
+		case 0x7000:
+			chip->V[INS_X(instruction)] += INS_NN(instruction);
+			break;
+		case 0xA000:
+			chip->I = INS_NNN(instruction);
+			break;
+		case 0xD000:
+			uint8_t vx = INS_X(instruction);
+			uint8_t vy = INS_Y(instruction);
+			uint8_t n = INS_N(instruction);
+			//TODO
+
+	
+	}
+
+}
+
+
+
+
 
 

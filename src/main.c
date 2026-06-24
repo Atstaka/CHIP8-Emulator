@@ -1,8 +1,10 @@
 #include "gui.h"
 int main(int argc, char *argv[]){
 	Scene screen;
-	InitWindow(&screen,720,1200);
+	chip8 chip;
+	InitWindow(&screen,720,1200,20,20);
 	bool loop = true;
+	loadROM(&chip,"/home/Atstaka/Documents/Projects/C/CHIP-8/IBM Logo.ch8");
 	//main loop
 	while (loop){
 		//events loop
@@ -12,6 +14,7 @@ int main(int argc, char *argv[]){
 				closeWindow(&screen);
 				
 			}
+			render(&screen,&chip);
 		}
 		SDL_Delay(16);
 	}

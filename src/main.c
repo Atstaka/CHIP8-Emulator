@@ -4,8 +4,11 @@ int main(int argc, char *argv[]){
 	chip8 chip;
 	InitWindow(&screen,720,1200,20,20);
 	bool loop = true;
-	loadROM(&chip,"/home/Atstaka/Documents/Projects/C/CHIP-8/IBM Logo.ch8");
-	//main loop
+	
+	bool ttemp =loadROM(&chip,"/home/Atstaka/Documents/Projects/C/CHIP-8/IBMLogo.ch8");	
+
+
+	#//main loop
 	while (loop){
 		//events loop
 		while(SDL_PollEvent(&screen.event)){	

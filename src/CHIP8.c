@@ -54,6 +54,7 @@ uint16_t fetch(chip8* chip){
 void excecute(chip8* chip){
 	uint16_t instruction = fetch(chip);
 	/*
+	 * Commented because i used macros to save memory 
 	//First Nibble. Tells what kind of instruction it is
 	uint8_t opcode = instruction & 0xF000;
 	//Second Nibble. Looks for one of registers
@@ -70,7 +71,11 @@ void excecute(chip8* chip){
 	switch(instruction & 0xF000){
 		case 0x0000:
 			if(instruction == 0x00E0){
-				//clear screen
+				for(int y = 0; y<CHIP8_SCREEN_HEIGHT;y++){
+					for(int x = 0; x<CHIP8_SCREEN_WIDTH;x++){
+						chip->display[y][x] = 0;
+					}
+				}
 			}
 			else if (instruction == 0x00EE){
 				chip->stackPointer--;
@@ -84,12 +89,13 @@ void excecute(chip8* chip){
 		case 0x2000:
 			chip->stack[chip->stackPointer] = chip->PC;
 			chip->stackPointer++;
+			chip->PC = INS_NNN(instruction);
 			break;
 		case 0x3000:
-			if(chip->V[INS_X(instruction) == INS_NN(instruction)]) chip->PC+=2;
+			if(chip->V[INS_X(instruction)] == INS_NN(instruction)) chip->PC+=2;
 			break;
 		case 0x4000:
-			if(chip->V[INS_X(instruction) != INS_NN(instruction)]) chip->PC+=2;
+			if(chip->V[INS_X(instruction)] != INS_NN(instruction)) chip->PC+=2;
 			break;
 		case 0x5000:
 			if(chip->V[INS_X(instruction)] == chip->V[INS_Y(instruction)]) chip->PC+=2;
@@ -106,14 +112,102 @@ void excecute(chip8* chip){
 		case 0xA000:
 			chip->I = INS_NNN(instruction);
 			break;
-		case 0xD000:
-			uint8_t vx = INS_X(instruction);
-			uint8_t vy = INS_Y(instruction);
+		case 0xD000:{
+			// x and y coordinates
+			uint8_t vx = chip->V[INS_X(instruction)];
+			uint8_t vy = chip->V[INS_Y(instruction)];
+			
 			uint8_t n = INS_N(instruction);
-			//TODO
+			chip->V[0xF] = 0;
+			
+			for(int row = 0; row<n; row++){
+				//for each row takes sprite from memory with basis of I
+				uint8_t sprite = chip->memory[chip->I + row];
+				//coordinate of y to start drawing from
+				uint8_t y=(vy+row)%CHIP8_SCREEN_HEIGHT;
+				for(int col = 0; col<8; col++){
+					//cordinate of x to start drawing from
+					uint8_t x=(vx+col)%CHIP8_SCREEN_WIDTH;
+					//checks each bit in sprite and changes its state if it should 
+					if(sprite & (0x80 >> col)){
+						//checks collision if bit is going to be drawn an is already on
+						//then it collides with another object
+						//in this case sets vf flag to 1
+						if(chip->display[y][x] == 1 ){
+							chip->V[0xF] = 1;
+						}
 
-	
-	}
+						//draws bit through xor
+						chip->display[y][x] ^=1;
+
+					}
+					
+
+				}
+			}
+
+
+			break;
+			    }
+		case 0x8000:{
+				switch(INS_N(instruction)){
+					case 0:
+						chip->V[INS_X(instruction)] = chip->V[INS_Y(instruction)];
+						break;
+					case 1:
+						chip->V[INS_X(instruction)] = chip->V[INS_Y(instruction)] | 
+										chip->V[INS_X(instruction)] ;
+						break;
+					case 2:
+						chip->V[INS_X(instruction)] = chip->V[INS_X(instruction)] &
+										chip->V[INS_Y(instruction)];
+						break;
+					case 3:
+						chip->V[INS_X(instruction)] =chip->V[INS_X(instruction)] ^
+										chip->V[INS_Y(instruction)];
+						break;
+					case 4:{
+						       //save sum in as 16 incase of overflow
+						uint16_t add =chip->V[INS_X(instruction)] +
+							chip->V[INS_Y(instruction)];
+						//save last significant bit to vx
+						chip->V[INS_X(instruction)] = add &0xFF;
+						//change overflow flag
+						if(add>255) chip->V[0xF] =1;
+						else chip->V[0xF] =0;
+						
+						break;
+					       }
+					case 5:{
+						uint8_t x =chip->V[INS_X(instruction)];
+						uint8_t y = chip->V[INS_Y(instruction)];
+						if(x<y) chip->V[0xF] = 0;
+						else chip->V[0xF] =1;
+						chip->V[INS_X(instruction)] = x-y;
+						
+						break;
+					       }
+					case 7:{
+						
+						uint8_t x=chip->V[INS_X(instruction)];
+						uint8_t y = chip->V[INS_Y(instruction)];
+						if(y<x) chip->V[0xF] = 0;
+						else chip->V[0xF] =1;
+						chip->V[INS_X(instruction)] = y-x;
+						
+						break;}
+					
+					//I Did not implemented case 8 and e
+
+
+				}
+			    	break;
+			    }
+		case 0xA: chip->I = INS_NNN(instruction);
+				break;
+		
+
+			    	}
 
 }
 

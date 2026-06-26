@@ -41,25 +41,33 @@ bool closeWindow(Scene* scene){
 }
 
 void render(Scene* scene,chip8* chip){
-	int pixelW = CHIP8_SCREEN_WIDTH * PIXEL_SCALE;
-	int pixelH = CHIP8_SCREEN_HEIGHT * PIXEL_SCALE;
-	for(int i =0; i< CHIP8_SCREEN_WIDTH * CHIP8_SCREEN_HEIGHT; i++){
+	int pixelW = PIXEL_SCALE;
+	int pixelH = PIXEL_SCALE;
+
 		SDL_Rect rect;
 
 		rect.w = pixelW;
 		rect.h = pixelH;
+		SDL_SetRenderDrawColor(scene->renderer,0,0,230,255);
+		SDL_RenderClear(scene->renderer);
+	//
+	//if lags dont draw every off pixel just make everything black at the beginning	
+	//
+		for(int y = 0; y<CHIP8_SCREEN_HEIGHT;y++){
+			for(int x = 0; x<CHIP8_SCREEN_WIDTH;x++){
+				rect.x = x*PIXEL_SCALE;
+				rect.y = y*PIXEL_SCALE;
+				if(chip->display[y][x] == 0){
+				
+				}
+				else{
+					SDL_SetRenderDrawColor(scene->renderer,255,255,255,255);
 
-
-		if(chip->display[i] == 1){
-			SDL_SetRenderDrawColor(scene->renderer,0,0,0,255);
-		}else{
-			SDL_SetRenderDrawColor(scene->renderer,255,255,255,255);
+					SDL_RenderFillRect(scene->renderer,&rect);
+				}
+			}
 		}
-
-		rect.x = (i% CHIP8_SCREEN_WIDTH) * pixelW;
-		rect.y = (i/ CHIP8_SCREEN_HEIGHT) * pixelH;
-		SDL_RenderFillRect(scene->renderer, &rect);
-	}
+	
 	
 	SDL_RenderPresent(scene->renderer);
 

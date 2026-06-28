@@ -7,9 +7,11 @@ int main(int argc, char *argv[]){
 	InitWindow(&screen,320,640,20,20);
 	bool loop = true;
 	
-	bool ttemp =loadROM(&chip,"/home/Atstaka/Documents/Projects/C/CHIP-8/1-chip8-logo.ch8");	
+//	bool ttemp =loadROM(&chip,"/home/Atstaka/Documents/Projects/C/CHIP-8/1-chip8-logo.ch8");	
 	//loadROM(&chip,"/home/Atstaka/Documents/Projects/C/CHIP-8/IBMLogo.ch8");
-	#//main loop
+	//loadROM(&chip,"/home/Atstaka/Documents/Projects/C/CHIP-8/danm8ku.ch8");
+	loadROM(&chip,"/home/Atstaka/Documents/Projects/C/CHIP-8/chipquarium.ch8");
+	//main loop
 	while (loop){
 		//events loop
 		while(SDL_PollEvent(&screen.event)){	

@@ -70,12 +70,13 @@ void excecute(chip8* chip){
 */
 	switch(instruction & 0xF000){
 		case 0x0000:
+			// clear screen instruction
+			// sets every bit from start of the array to 0
 			if(instruction == 0x00E0){
-				for(int y = 0; y<CHIP8_SCREEN_HEIGHT;y++){
-					for(int x = 0; x<CHIP8_SCREEN_WIDTH;x++){
-						chip->display[y][x] = 0;
-					}
-				}
+				uint16_t *pdisplay = &chip->display[0][0];
+				for(int i =0; i<CHIP8_SCREEN_SIZE;i++){
+					*(pdisplay+i) =0;
+				}				
 			}
 			else if (instruction == 0x00EE){
 				chip->stackPointer--;

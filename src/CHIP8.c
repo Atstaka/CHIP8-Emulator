@@ -78,6 +78,7 @@ void excecute(chip8* chip){
 					*(pdisplay+i) =0;
 				}				
 			}
+			//jumps to the last address from stack 
 			else if (instruction == 0x00EE){
 				chip->stackPointer--;
 				chip->PC = chip->stack[chip->stackPointer];
@@ -87,32 +88,43 @@ void excecute(chip8* chip){
 		case 0x1000:
 			chip->PC = INS_NNN(instruction);
 			break;
+		// Saves pc in stack and changes PC. Used mostly with 0x00EE
 		case 0x2000:
 			chip->stack[chip->stackPointer] = chip->PC;
 			chip->stackPointer++;
 			chip->PC = INS_NNN(instruction);
 			break;
+		// skips if vx = nn
 		case 0x3000:
 			if(chip->V[INS_X(instruction)] == INS_NN(instruction)) chip->PC+=2;
 			break;
+		//skips if vx != nn
 		case 0x4000:
 			if(chip->V[INS_X(instruction)] != INS_NN(instruction)) chip->PC+=2;
 			break;
+		//skips if vx = vy
 		case 0x5000:
 			if(chip->V[INS_X(instruction)] == chip->V[INS_Y(instruction)]) chip->PC+=2;
 			break;
+		//skips if vx != vy
 		case 0x9000:
 			if(chip->V[INS_X(instruction)] != chip->V[INS_Y(instruction)]) chip->PC+=2;
 			break;
+		//Sets vx to NN
 		case 0x6000:
 			chip->V[INS_X(instruction)] = INS_NN(instruction);
 			break;
+		//Adds NN to vx
 		case 0x7000:
 			chip->V[INS_X(instruction)] += INS_NN(instruction);
 			break;
+		// Sets I to NNN
 		case 0xA000:
 			chip->I = INS_NNN(instruction);
 			break;
+		//Display instruction
+		//Draws n pixel tall sprites from memory[I]
+		//starts at vx and vy 
 		case 0xD000:{
 			// x and y coordinates
 			uint8_t vx = chip->V[INS_X(instruction)];
@@ -150,6 +162,7 @@ void excecute(chip8* chip){
 
 			break;
 			    }
+		// Logical and Arithmetic Operations
 		case 0x8000:{
 				switch(INS_N(instruction)){
 					case 0:
@@ -204,6 +217,7 @@ void excecute(chip8* chip){
 				}
 			    	break;
 			    }
+		//sets Index register to value NNN
 		case 0xA: chip->I = INS_NNN(instruction);
 				break;
 		

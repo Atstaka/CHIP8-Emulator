@@ -53,7 +53,7 @@ void render(Scene* scene,chip8* chip){
 	//
 	//if lags dont draw every off pixel just make everything black at the beginning	
 	//
-	/*	for(int y = 0; y<CHIP8_SCREEN_HEIGHT;y++){
+	for(int y = 0; y<CHIP8_SCREEN_HEIGHT;y++){
 			for(int x = 0; x<CHIP8_SCREEN_WIDTH;x++){
 				rect.x = x*PIXEL_SCALE;
 				rect.y = y*PIXEL_SCALE;
@@ -67,27 +67,7 @@ void render(Scene* scene,chip8* chip){
 				}
 			}
 		}
-		*/
-		// gets the address of start of the array and checks every 
-		uint16_t *pdisplay = &chip->display[0][0];
-		int x =0;
-		int y = 0;
 
-		for(int i = 0; i< CHIP8_SCREEN_SIZE;i++){
-			rect.y = y* PIXEL_SCALE;
-			rect.x = x* PIXEL_SCALE;
-			if(*(pdisplay+i) == 1){
-				SDL_SetRenderDrawColor(scene->renderer,255,255,255,255);
-				SDL_RenderFillRect(scene->renderer,&rect);
-			}
-			x++;
-			if(x == CHIP8_SCREEN_WIDTH){
-				y++;
-				x=0;
-			}
-		}
-	
-	
 	SDL_RenderPresent(scene->renderer);
 
 }

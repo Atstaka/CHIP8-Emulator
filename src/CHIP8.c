@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
 #include "CHIP8.h"
 
 void initialize(chip8* chip){
@@ -46,7 +47,7 @@ uint16_t fetch(chip8* chip){
 	instruction = instruction<<8;
 	// add last 8 bytes from next adress
 	instruction = instruction | chip->memory[chip->PC+1];
-	//moved pc to next address
+	/moved pc to next address
 	chip->PC += 2;
 	
 	return instruction;
@@ -220,9 +221,68 @@ void excecute(chip8* chip){
 		//sets Index register to value NNN
 		case 0xA: chip->I = INS_NNN(instruction);
 				break;
-		
+		//jumps to addres on addition of v0 and nnn
+		//ther eis also quirk veresion which is different from this. that is but TODO
+		//
+		case 0xB: chip->PC = chip>v[0] + INS_NNN(instruction);
+			  break;
+		// creates a random number and then ands it with NN
+		case 0xC: uint8_t randomNumber = rand()%256;
+			  chip->V[INS_X(instruction)] = randomNumber & INS_NN(instruction);
+			  break;
+		//Skips if key is/ is not pressed
+		case 0xE:
+			  switch(INS_NN(instruction)){
+				case 0x9E:{
+						if(chip->keys[chip->V[INS_X(instruction)]]) chip->PC +=2;
+						break;
+					  }
+				case 0xA1: {
+						if(!chip->keys[chip->V[INS_X(instruction)]]) chip-> PC +=2;
+						break;
+					    }
+			  }
+			  break;
+		// Manipulates Timers
+		case 0xF:
+			  switch(INS_NN(instruction)){
+				//sets vx to delay timer
+				case 0x07: 
+					chip->V[INS_X(instruction)] = chip->delayTimer;
+					     break;
+				//sets delay timer to vx
+				case 0x15:
+					chip->delayTimer = chip->V[INS_X(instruction)];
+					     break;
+				//sets sound timer to vx
+				case 0x18:
+					chip->soundTimer = chip->V[INS_X(instruction)]
+				// adds value in vx to I register, sets vf to 1 in case of overflow like in amiga
+				case 0x1E: {
+						 chip->I += chip->V[INS_X(instruction)];
+						if (chip->I > 0x0FFF) {
+              						chip->V[0xF] = 1;
+           					} 
+						else {
+              						chip->V[0xF] = 0;
+          				  	}
 
-			    	}
+
+					   }
+				// reducec PC by 2 while it waits for a key press action
+				case 0x0A: {
+					bool isPressed = false;
+					for(i int = 0; i<16; i++){
+						if(chip->keys[i] == 1){
+							chip->V[INS_X(instruction)] = i;
+							isPressed = true;
+							break;
+						}
+					}
+					if(!isPressed) chip->PC -=2;
+					   break;}
+				case 0x29: chip->I =chip->V[INS_X(instruction)] & 0xF; //TODO is not complete
+
 
 }
 

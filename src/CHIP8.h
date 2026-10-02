@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #define CHIP8_MEMORY_SIZE 4096
-#define CHIP8_SCREEN_HEIGHT 64
-#define CHIP8_SCREEN_WIDTH 32
+#define CHIP8_SCREEN_HEIGHT 32
+#define CHIP8_SCREEN_WIDTH 64
 #define DELAY_TIMER 60//frames per sec 60hz
 #define V_REGISTER_AMOUNT 16
 #define PC_START 0x200
@@ -23,12 +23,12 @@ typedef struct chip8{
 	uint16_t I; //index register
 	uint16_t stack[STACK_AMOUNT];
 	uint8_t stackPointer;
-	uint8_t delayTimer;
+ 	uint8_t delayTimer;
 	uint8_t soundTimer;
 	uint8_t V[V_REGISTER_AMOUNT];
 	uint16_t PC;
 	uint8_t keys[IKEY_AMOUNT];
-	uint16_t display[CHIP8_SCREEN_SIZE];
+	uint16_t display[CHIP8_SCREEN_HEIGHT][CHIP8_SCREEN_WIDTH];
 } chip8;
 
 void initialize(chip8* chip);
